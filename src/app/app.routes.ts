@@ -14,5 +14,9 @@ export const routes: Routes = [
     {
         path: 'register',
         loadComponent: () => import('./page/register/register.component').then(mod => mod.RegisterComponent)
+    },
+    {
+        path: '**',
+        redirectTo: ''
     }
 ];
