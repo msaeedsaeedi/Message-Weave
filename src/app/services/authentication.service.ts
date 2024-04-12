@@ -6,12 +6,10 @@ import { account } from '@lib/appwrite';
 })
 export class AuthenticationService {
 
-  private loggedInUser: any;
-
   public async Login(email: string, password: string): Promise<boolean> {
     try {
       await account.createEmailSession(email, password);
-      this.loggedInUser = await account.get();
+      sessionStorage.setItem("LoggedIn", "true");
       return true;
     }
     catch {
@@ -30,7 +28,7 @@ export class AuthenticationService {
   }
 
   public IsLoggedIn(): boolean {
-    if (this.loggedInUser)
+    if (sessionStorage.getItem('LoggedIn') == "true")
       return true;
     return false;
   }
