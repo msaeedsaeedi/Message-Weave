@@ -27,10 +27,14 @@ export class AuthenticationService {
     }
   }
 
-  public IsLoggedIn(): boolean {
-    if (sessionStorage.getItem('LoggedIn') == "true")
+  public async IsLoggedIn(): Promise<boolean> {
+    try {
+      await account.get();
       return true;
-    return false;
+    } catch (error) {
+      return false;
+    }
+
   }
 
 }
