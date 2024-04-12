@@ -1,1 +1,8 @@
-<p>chatroom works!</p>
+<textarea name="message" id="messagebox" cols="30" rows="10" placeholder="Type Message here"
+    [(ngModel)]="message"></textarea>
+<button (click)="send(message)">Send Message</button>
+<ul>
+    @for (message of messages; track $index) {
+    <li>{{message.message}} - {{message.sentby}}</li>
+    }
+</ul>
