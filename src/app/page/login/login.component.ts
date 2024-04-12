@@ -9,4 +9,8 @@ import { Component } from '@angular/core';
 })
 export class LoginComponent {
 
+  email: string = '';
+  password: string = '';
+  async login(email: string, password: string) {
+  }
 }
