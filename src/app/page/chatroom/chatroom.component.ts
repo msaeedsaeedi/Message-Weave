@@ -1,10 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-
-interface Message {
-  message: string,
-  sentby: string
-}
+import client from '@lib/appwrite';
+import { MessagingService } from '@services/messaging.service';
+import { Message } from 'app/interfaces/message';
 
 @Component({
   selector: 'app-chatroom',
@@ -15,25 +13,19 @@ interface Message {
 })
 
 export class ChatroomComponent implements OnInit {
-  messages: Message[] = [
-    {
-      message: "Hi",
-      sentby: 'Sana Tariq'
-    },
-    {
-      message: "Hello",
-      sentby: 'Mohammad Saeed'
-    }
-  ];
-
+  messages: Message[] = [];
   message: string = '';
 
-  ngOnInit(): void {
+  message_service = inject(MessagingService);
 
+  ngOnInit(): void {
+    this.message_service.LoadMessages().then((data) => {
+      this.messages = data;
+    })
   }
 
   send(message: string): void {
     console.log(message);
-
+    this.message_service.SendMessage(message);
   }
 }
