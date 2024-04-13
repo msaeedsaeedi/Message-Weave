@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { account, ID } from '@lib/appwrite';
+import { account, COLLECTION_ID_USERS, DATABASE_ID, databases, ID } from '@lib/appwrite';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +21,12 @@ export class AuthenticationService {
   public async Register(name: string, email: string, password: string): Promise<boolean> {
     try {
       await account.create(ID.unique(), email, password, name);
+
       if (await this.Login(email, password)) {
+        await databases.createDocument(DATABASE_ID, COLLECTION_ID_USERS, ID.unique(), {
+          user_id: (await account.get()).$id,
+          Username: name
+        });
         return true;
       }
       console.log("Login Failed");
