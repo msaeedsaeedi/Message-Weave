@@ -1,8 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import client from '@lib/appwrite';
 import { MessagingService } from '@services/messaging.service';
 import { Message } from 'app/interfaces/message';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chatroom',
@@ -12,16 +12,25 @@ import { Message } from 'app/interfaces/message';
   styleUrl: './chatroom.component.css'
 })
 
-export class ChatroomComponent implements OnInit {
+export class ChatroomComponent implements OnDestroy {
   messages: Message[] = [];
   message: string = '';
 
   message_service = inject(MessagingService);
+  listening_message: Subscription;
 
-  ngOnInit(): void {
+  constructor() {
     this.message_service.LoadMessages().then((data) => {
       this.messages = data;
     })
+
+    this.listening_message = this.message_service.Listen().subscribe(data => {
+      this.messages.push(data);
+    })
+  }
+
+  ngOnDestroy(): void {
+    this.listening_message.unsubscribe();
   }
 
   send(message: string): void {
