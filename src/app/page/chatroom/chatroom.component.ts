@@ -30,6 +30,10 @@ export class ChatroomComponent implements OnDestroy {
     return <string>this.users.find(item => item.user_id === id)?.Username;
   }
 
+  getPhoto(id: string): URL {
+    return <URL>this.users.find(item => item.user_id === id)?.Photo;
+  }
+
   listening_message: Subscription;
 
   constructor() {

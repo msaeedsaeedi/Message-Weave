@@ -3,7 +3,9 @@
 <button (click)="send(message)">Send Message</button>
 <ul>
     @for (message of messages; track $index) {
-    <li>{{message.message}} - {{ getName(message.sentby) }}
+    <li>
+        <img src="{{ getPhoto(message.sentby )}}" alt="Profile Photo" height="50px" width="50px">
+        {{message.message}} - {{ getName(message.sentby) }}
         @if (message.sentby === user_id) {
         <button (click)="delete(message.id)">X</button>
         }
