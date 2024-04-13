@@ -8,7 +8,8 @@ export class AuthenticationService {
 
   public async Login(email: string, password: string): Promise<boolean> {
     try {
-      this.Logout();
+      if (await this.IsLoggedIn())
+        this.Logout();
       await account.createEmailSession(email, password);
       return true;
     }
