@@ -24,12 +24,7 @@ export class ChatroomComponent implements OnDestroy {
   users_service = inject(UsersService);
 
   user_id: string | undefined;
-  users: User_R[] = [
-    {
-      "user_id": "661a5aacb318b69c470a",
-      "Username": "Saeed"
-    }
-  ];
+  users: User_R[] = [];
 
   getName(id: string): string {
     return <string>this.users.find(item => item.user_id === id)?.Username;
