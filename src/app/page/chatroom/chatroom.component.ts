@@ -1,7 +1,9 @@
 import { Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { account } from '@lib/appwrite';
+import { AuthenticationService } from '@services/authentication.service';
 import { MessagingService } from '@services/messaging.service';
-import { Message } from 'app/interfaces/message';
+import { Message, MessageOperation } from 'app/interfaces/message';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -9,7 +11,8 @@ import { Subscription } from 'rxjs';
   standalone: true,
   imports: [FormsModule],
   templateUrl: './chatroom.component.html',
-  styleUrl: './chatroom.component.css'
+  styleUrl: './chatroom.component.css',
+  providers: [MessagingService]
 })
 
 export class ChatroomComponent implements OnDestroy {
@@ -17,6 +20,8 @@ export class ChatroomComponent implements OnDestroy {
   message: string = '';
 
   message_service = inject(MessagingService);
+
+  user_id: string | undefined;
   listening_message: Subscription;
 
   constructor() {
@@ -24,8 +29,20 @@ export class ChatroomComponent implements OnDestroy {
       this.messages = data;
     })
 
+    account.get().then(user => {
+      this.user_id = user.$id;
+    });
+
     this.listening_message = this.message_service.Listen().subscribe(data => {
-      this.messages.push(data);
+      if (data.operation == MessageOperation.Deleted) {
+        this.messages = this.messages.filter(message =>
+          !(message.id === data.id &&
+            message.message === data.message &&
+            message.sentby === data.sentby)
+        );
+      } else {
+        this.messages.push(data);
+      }
     })
   }
 
@@ -34,7 +51,10 @@ export class ChatroomComponent implements OnDestroy {
   }
 
   send(message: string): void {
-    console.log(message);
     this.message_service.SendMessage(message);
+  }
+
+  delete(id: string): void {
+    this.message_service.DeleteMessage(id);
   }
 }
