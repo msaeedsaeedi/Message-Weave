@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { account } from '@lib/appwrite';
 import { AuthenticationService } from '@services/authentication.service';
 import { MessagingService } from '@services/messaging.service';
+import { User_R, UsersService } from '@services/users.service';
 import { Message, MessageOperation } from 'app/interfaces/message';
 import { Subscription } from 'rxjs';
 
@@ -20,17 +21,33 @@ export class ChatroomComponent implements OnDestroy {
   message: string = '';
 
   message_service = inject(MessagingService);
+  users_service = inject(UsersService);
 
   user_id: string | undefined;
+  users: User_R[] = [
+    {
+      "user_id": "661a5aacb318b69c470a",
+      "Username": "Saeed"
+    }
+  ];
+
+  getName(id: string): string {
+    return <string>this.users.find(item => item.user_id === id)?.Username;
+  }
+
   listening_message: Subscription;
 
   constructor() {
+    account.get().then(user => {
+      this.user_id = user.$id;
+    });
+
     this.message_service.LoadMessages().then((data) => {
       this.messages = data;
     })
 
-    account.get().then(user => {
-      this.user_id = user.$id;
+    this.users_service.getUsers().then(data => {
+      this.users.push(...data);
     });
 
     this.listening_message = this.message_service.Listen().subscribe(data => {

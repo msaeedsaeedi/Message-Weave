@@ -3,7 +3,7 @@
 <button (click)="send(message)">Send Message</button>
 <ul>
     @for (message of messages; track $index) {
-    <li>{{message.message}} - {{message.sentby}}
+    <li>{{message.message}} - {{ getName(message.sentby) }}
         @if (message.sentby === user_id) {
         <button (click)="delete(message.id)">X</button>
         }
