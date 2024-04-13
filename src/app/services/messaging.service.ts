@@ -1,8 +1,6 @@
-import { inject, Injectable } from '@angular/core';
 import client, { account, DATABASE_ID, databases, ID, COLLECTION_ID_MESSAGES } from '@lib/appwrite';
 import { Message, OMessage, MessageOperation } from 'app/interfaces/message';
 import { Observable } from 'rxjs';
-import { AuthenticationService } from './authentication.service';
 
 export class MessagingService {
 

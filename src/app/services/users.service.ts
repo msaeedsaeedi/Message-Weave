@@ -1,4 +1,3 @@
-import { Injectable } from '@angular/core';
 import { BUCKET_ID_PROFILE_PHOTOS, COLLECTION_ID_USERS, DATABASE_ID, databases, storage } from '@lib/appwrite';
 import { Query } from 'appwrite';
 
@@ -7,10 +6,6 @@ export interface User_R {
   Username: string,
   Photo: URL
 }
-
-@Injectable({
-  providedIn: 'root'
-})
 export class UsersService {
 
   constructor() { }
