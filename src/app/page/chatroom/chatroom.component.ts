@@ -1,7 +1,6 @@
 import { Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { account } from '@lib/appwrite';
-import { AuthenticationService } from '@services/authentication.service';
 import { MessagingService } from '@services/messaging.service';
 import { User_R, UsersService } from '@services/users.service';
 import { Message, MessageOperation } from 'app/interfaces/message';
@@ -26,6 +25,8 @@ export class ChatroomComponent implements OnDestroy {
   user_id: string | undefined;
   users: User_R[] = [];
 
+  listening_message: Subscription;
+
   getName(id: string): string {
     return <string>this.users.find(item => item.user_id === id)?.Username;
   }
@@ -33,8 +34,6 @@ export class ChatroomComponent implements OnDestroy {
   getPhoto(id: string): URL {
     return <URL>this.users.find(item => item.user_id === id)?.Photo;
   }
-
-  listening_message: Subscription;
 
   constructor() {
     account.get().then(user => {

@@ -14,13 +14,13 @@ export class RegisterComponent {
   name: string = '';
   email: string = '';
   password: string = '';
+  photo: File | undefined;
 
   router = inject(Router);
   auth = inject(AuthenticationService);
 
   register(name: string, email: string, password: string): void {
-
-    this.auth.Register(name, email, password).then((e) => {
+    this.auth.Register(name, email, password, <File>this.photo).then((e) => {
       if (e) {
         this.router.navigate(['']);
       }
@@ -28,5 +28,10 @@ export class RegisterComponent {
         console.log("Login Failed");
       }
     })
+  }
+
+  onPhotoSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.photo = (target.files as FileList)[0];
   }
 }

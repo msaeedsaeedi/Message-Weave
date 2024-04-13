@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { account, COLLECTION_ID_USERS, DATABASE_ID, databases, ID } from '@lib/appwrite';
+import { account, BUCKET_ID_PROFILE_PHOTOS, COLLECTION_ID_USERS, DATABASE_ID, databases, ID, storage } from '@lib/appwrite';
 
 @Injectable({
   providedIn: 'root'
@@ -18,14 +18,17 @@ export class AuthenticationService {
     }
   }
 
-  public async Register(name: string, email: string, password: string): Promise<boolean> {
+  public async Register(name: string, email: string, password: string, photo: File): Promise<boolean> {
     try {
-      await account.create(ID.unique(), email, password, name);
+      const id = (await account.create(ID.unique(), email, password, name)).$id;
 
       if (await this.Login(email, password)) {
+        const image_id = (await storage.createFile(BUCKET_ID_PROFILE_PHOTOS, ID.unique(), photo)).$id;
+
         await databases.createDocument(DATABASE_ID, COLLECTION_ID_USERS, ID.unique(), {
-          user_id: (await account.get()).$id,
-          Username: name
+          user_id: id,
+          Username: name,
+          Photo: image_id
         });
         return true;
       }

@@ -3,6 +3,7 @@
         <input type="text" placeholder="Name" [(ngModel)]="name" />
         <input type="email" placeholder="Email" [(ngModel)]="email" />
         <input type="password" placeholder="Password" [(ngModel)]="password" />
+        <input type="file" name="photo" id="photo" (change)="onPhotoSelected($event)">
         <button (click)="register(name, email, password)">
             Login
         </button>

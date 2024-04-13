@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { COLLECTION_ID_USERS, DATABASE_ID, databases } from '@lib/appwrite';
+import { BUCKET_ID_PROFILE_PHOTOS, COLLECTION_ID_USERS, DATABASE_ID, databases, storage } from '@lib/appwrite';
 import { Query } from 'appwrite';
 
 export interface User_R {
@@ -20,7 +20,11 @@ export class UsersService {
     return ret.documents.map<User_R>(doc => ({
       user_id: doc['user_id'],
       Username: doc['Username'],
-      Photo: <URL>doc["Photo"]
+      Photo: this.getPhoto(doc['Photo'])
     }));
+  }
+
+  private getPhoto(id: string): URL {
+    return storage.getFileView(BUCKET_ID_PROFILE_PHOTOS, id);
   }
 }
