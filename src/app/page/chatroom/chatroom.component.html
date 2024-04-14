@@ -4,8 +4,8 @@
 <ul>
     @for (message of messages; track $index) {
     <li>
-        <img src="{{ getPhoto(message.sentby )}}" alt="Profile Photo" height="50px" width="50px">
-        {{message.message}} - {{ getName(message.sentby) }}
+        <img [src]="(message.sentby | getPhoto : users : usersloaded) | async" alt="Profile Photo" height="50px" width="50px">
+        {{message.message}} - {{ message.sentby | getName : users}}
         @if (message.sentby === user_id) {
         <button (click)="delete(message.id)">X</button>
         }

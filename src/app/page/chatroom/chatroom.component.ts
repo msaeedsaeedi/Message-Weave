@@ -1,6 +1,9 @@
+import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { account } from '@lib/appwrite';
+import { GetNamePipe } from '@pipes/get-name.pipe';
+import { GetPhotoPipe } from '@pipes/get-photo.pipe';
 import { MessagingService } from '@services/messaging.service';
 import { User_R, UsersService } from '@services/users.service';
 import { Message, MessageOperation } from 'app/interfaces/message';
@@ -9,47 +12,57 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-chatroom',
   standalone: true,
-  imports: [FormsModule],
   templateUrl: './chatroom.component.html',
   styleUrl: './chatroom.component.css',
-  providers: [MessagingService]
+  providers: [MessagingService, UsersService],
+  imports: [FormsModule, GetNamePipe, GetPhotoPipe, CommonModule]
 })
 
 export class ChatroomComponent implements OnDestroy {
   messages: Message[] = [];
   message: string = '';
 
-  message_service = inject(MessagingService);
-  users_service = inject(UsersService);
+  messageService = inject(MessagingService);
+  usersService = inject(UsersService);
 
   user_id: string | undefined;
   users: User_R[] = [];
 
-  listening_message: Subscription;
+  usersloaded!: Promise<boolean>;
 
-  getName(id: string): string {
-    return <string>this.users.find(item => item.user_id === id)?.Username;
+  listeningMessage!: Subscription;
+
+  constructor() { }
+
+  ngOnInit(): void {
+    this.initializeUserData();
+    this.loadMessages();
+    this.listenForMessages();
   }
 
-  getPhoto(id: string): URL {
-    return <URL>this.users.find(item => item.user_id === id)?.Photo;
+  ngOnDestroy(): void {
+    this.listeningMessage.unsubscribe();
   }
 
-  constructor() {
-    account.get().then(user => {
+
+  async initializeUserData(): Promise<void> {
+    this.usersloaded = new Promise(async resolve => {
+      const user = await account.get();
       this.user_id = user.$id;
-    });
 
-    this.message_service.LoadMessages().then((data) => {
-      this.messages = data;
+      const userData = await this.usersService.getUsers();
+      this.users.push(...userData);
+      resolve(true);
     })
+  }
 
-    this.users_service.getUsers().then(data => {
-      this.users.push(...data);
-    });
+  async loadMessages(): Promise<void> {
+    this.messages = await this.messageService.LoadMessages();
+  }
 
-    this.listening_message = this.message_service.Listen().subscribe(data => {
-      if (data.operation == MessageOperation.Deleted) {
+  listenForMessages(): void {
+    this.listeningMessage = this.messageService.Listen().subscribe(data => {
+      if (data.operation === MessageOperation.Deleted) {
         this.messages = this.messages.filter(message =>
           !(message.id === data.id &&
             message.message === data.message &&
@@ -58,18 +71,14 @@ export class ChatroomComponent implements OnDestroy {
       } else {
         this.messages.push(data);
       }
-    })
-  }
-
-  ngOnDestroy(): void {
-    this.listening_message.unsubscribe();
+    });
   }
 
   send(message: string): void {
-    this.message_service.SendMessage(message);
+    this.messageService.SendMessage(message);
   }
 
   delete(id: string): void {
-    this.message_service.DeleteMessage(id);
+    this.messageService.DeleteMessage(id);
   }
 }

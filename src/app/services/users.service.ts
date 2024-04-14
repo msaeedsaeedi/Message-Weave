@@ -19,6 +19,15 @@ export class UsersService {
     }));
   }
 
+  public async getUserswithid(id: string): Promise<User_R[]> {
+    const ret = await databases.listDocuments(DATABASE_ID, COLLECTION_ID_USERS, [Query.select(["user_id", "Username", "Photo"]), Query.equal("user_id", id)]);
+    return ret.documents.map<User_R>(doc => ({
+      user_id: doc['user_id'],
+      Username: doc['Username'],
+      Photo: this.getPhoto(doc['Photo'])
+    }));
+  }
+
   private getPhoto(id: string): URL {
     return storage.getFileView(BUCKET_ID_PROFILE_PHOTOS, id);
   }
